@@ -48,9 +48,13 @@
               "target": "Package",
               "version": "[1.0.0, )"
             },
-            "Microsoft.AspNetCore.Session": {
+            "FirebaseAdmin": {
               "target": "Package",
-              "version": "[2.2.0, )"
+              "version": "[2.4.0, )"
+            },
+            "MongoDB.Driver": {
+              "target": "Package",
+              "version": "[2.23.1, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
