@@ -1,10 +1,9 @@
 ﻿using Firebase.Auth;
-using FirebaseAdmin.Auth;
 using fitate.Models;
+using fitate.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using FirebaseAuthException = Firebase.Auth.FirebaseAuthException;
-
 namespace fitate.Controllers;
 
 [Route("api/user")]
@@ -13,20 +12,37 @@ public class LoginController: ControllerBase
 {
     private FirebaseAuthProvider auth;
 
+    private readonly DatabaseUtils.DatabaseUtils _databaseUtils;
+
+    private UserUtils tokenVerifier;
+    
     public LoginController()
     {
         DotNetEnv.Env.Load();
         auth = new FirebaseAuthProvider(new FirebaseConfig(Environment.GetEnvironmentVariable("FIREBASE_KEY")));
+        _databaseUtils = new DatabaseUtils.DatabaseUtils(Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING"), Environment.GetEnvironmentVariable("MONGO_DATABASE_NAME"));
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Registration([FromBody] LoginModel loginModel)
     {
+        var collection = _databaseUtils.GetUserCollection<UserModel>("users");
         try
         {
             await auth.CreateUserWithEmailAndPasswordAsync(loginModel.Email, loginModel.Password);
             var fbAuthLink = await auth.SignInWithEmailAndPasswordAsync(loginModel.Email, loginModel.Password);
+            
             string token = fbAuthLink.FirebaseToken;
+
+            string uid = await tokenVerifier.VerifyUser(token);
+
+            var newUser = new UserModel
+            {
+                UID = uid
+            };
+            
+            collection.InsertOne(newUser);
+            
             var res = new
             {
                 token = token, 
@@ -52,10 +68,9 @@ public class LoginController: ControllerBase
                 
             string token = fbAuthLink.FirebaseToken;
             
-            
             var res = new
             {
-                token = token,
+                token = token
             };
             return new JsonResult(res);
         }
@@ -67,20 +82,6 @@ public class LoginController: ControllerBase
                 error = firebaseEx.error.message
             };
             return new JsonResult(error);
-        }
-    }
-
-    [HttpPost("createRecord")]
-    public async Task<IActionResult> CreateRecord([FromBody] CreateRecord createRecord)
-    {
-        try
-        {
-
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
         }
     }
 }
