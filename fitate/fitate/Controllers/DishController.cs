@@ -54,6 +54,7 @@ public class DishController : ControllerBase
                     DefaultPortion = 100, //grams
                     Proteins = proteins,
                     Fats = fats,
+                    Carbs = carbs,
                     TotalCallories = callories,
                     Name = dishModel.Name,
                     AuthorId = user.Id
