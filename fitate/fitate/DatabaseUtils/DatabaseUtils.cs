@@ -7,14 +7,20 @@ public class DatabaseUtils
 {
     private readonly IMongoDatabase _mongoDatabase;
 
-    public DatabaseUtils(string connectionString, string dbName)
+    public DatabaseUtils()
     {
-        var client = new MongoClient(connectionString);
-        _mongoDatabase = client.GetDatabase(dbName);
+        DotNetEnv.Env.Load();
+        var client = new MongoClient(Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING"));
+        _mongoDatabase = client.GetDatabase(Environment.GetEnvironmentVariable("MONGO_DATABASE_NAME"));
     }
 
-    public IMongoCollection<UserModel> GetUserCollection<UserModel>(string collectionName)
+    public IMongoCollection<UserModel> GetUserCollection()
     {
-        return _mongoDatabase.GetCollection<UserModel>(collectionName);
+        return _mongoDatabase.GetCollection<UserModel>("users");
+    }
+    
+    public IMongoCollection<DishModel.Dish> GetDishCollection()
+    {
+        return _mongoDatabase.GetCollection<DishModel.Dish>("dishes");
     }
 }

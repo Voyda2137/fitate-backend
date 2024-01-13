@@ -16,24 +16,25 @@ public class LoginController: ControllerBase
 
     private UserUtils tokenVerifier;
     
-    public LoginController()
+    public LoginController(UserUtils userUtils)
     {
         DotNetEnv.Env.Load();
+        tokenVerifier = userUtils;
         auth = new FirebaseAuthProvider(new FirebaseConfig(Environment.GetEnvironmentVariable("FIREBASE_KEY")));
-        _databaseUtils = new DatabaseUtils.DatabaseUtils(Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING"), Environment.GetEnvironmentVariable("MONGO_DATABASE_NAME"));
+        _databaseUtils = new DatabaseUtils.DatabaseUtils();
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Registration([FromBody] LoginModel loginModel)
     {
-        var collection = _databaseUtils.GetUserCollection<UserModel>("users");
+        var collection = _databaseUtils.GetUserCollection();
         try
         {
             await auth.CreateUserWithEmailAndPasswordAsync(loginModel.Email, loginModel.Password);
             var fbAuthLink = await auth.SignInWithEmailAndPasswordAsync(loginModel.Email, loginModel.Password);
             
             string token = fbAuthLink.FirebaseToken;
-
+            
             string uid = await tokenVerifier.VerifyUser(token);
 
             var newUser = new UserModel

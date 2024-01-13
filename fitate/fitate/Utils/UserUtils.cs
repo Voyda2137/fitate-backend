@@ -1,15 +1,16 @@
 ﻿using FirebaseAdmin.Auth;
 using MongoDB.Driver;
 using fitate.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 
 namespace fitate.Utils;
 
 public class UserUtils
 {
     private readonly IMongoCollection<UserModel> _userCollection;
-    
+    public UserUtils(DatabaseUtils.DatabaseUtils databaseUtils)
+    {
+        _userCollection = databaseUtils.GetUserCollection();
+    }
     public async Task<string> VerifyUser(string token)
     {
         try
@@ -29,16 +30,5 @@ public class UserUtils
     {
         var filter = Builders<UserModel>.Filter.Eq(u => u.UID, uid);
         return await _userCollection.Find(filter).FirstOrDefaultAsync() ?? throw new Exception("User not found");
-    }
-
-    public string GetAuthHeader(HttpContext httpContext)
-    {
-        if (httpContext.Request.Headers.TryGetValue("Authorization", out var authHeaderValue))
-        {
-            string authHeader = authHeaderValue;
-            return authHeader;
-        }
-
-        return null;
     }
 }

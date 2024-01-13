@@ -1,6 +1,7 @@
 using FirebaseAdmin;
+using fitate.DatabaseUtils;
+using fitate.Utils;
 using Google.Apis.Auth.OAuth2;
-using MongoDB.Driver;
 
 FirebaseApp.Create(new AppOptions
 {
@@ -26,6 +27,14 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<DatabaseUtils>(sp =>
+{
+    return new DatabaseUtils();
+});
+
+builder.Services.AddScoped<UserUtils>();
+builder.Services.AddScoped<DishUtils>();
 
 var app = builder.Build();
 

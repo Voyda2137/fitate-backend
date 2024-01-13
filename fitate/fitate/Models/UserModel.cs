@@ -1,16 +1,18 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace fitate.Models;
 
 public enum MealTime
 {
     Breakfast,
-    Lunch,
-    Dinner
+    Dinner,
+    Supper
 }
 
 public class Dish
 {
+    [BsonRepresentation(BsonType.ObjectId)]
     public string DishId { get; set; }
     public int Portion { get; set; }
     public MealTime MealTime { get; set; }
@@ -19,6 +21,7 @@ public class Dish
 
 public class Workout
 {
+    [BsonRepresentation(BsonType.ObjectId)]
     public string WorkoutId { get; set; }
     public int? Reps { get; set; }
     public double? Weight { get; set; }

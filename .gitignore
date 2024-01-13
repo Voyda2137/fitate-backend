@@ -14,3 +14,5 @@
 *.xml
 fitate/fitate/.env
 fitate/fitate/pwsw-906cf-firebase-adminsdk-2350p-100d2aa3a6.json
+*.sentinel
+*.info
