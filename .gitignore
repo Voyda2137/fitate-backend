@@ -4,7 +4,24 @@
 # Rider ignored files
 /projectSettingsUpdater.xml
 /contentModel.xml
-/.idea.fitate.iml
+# JetBrains Rider
+.idea/
+*.sln.iml
+# ASP.NET
+*.obj
+*.exe
+*.dll
+*.pdb
+*.user
+*.iws
+*.iwp
+*.suo
+*.cache
+*.log
+*.vscode
+project.lock.json
+project.fragment.lock.json
+artifacts/
 /modules.xml
 # Editor-based HTTP Client requests
 /httpRequests/
@@ -16,3 +33,4 @@ fitate/fitate/.env
 fitate/fitate/pwsw-906cf-firebase-adminsdk-2350p-100d2aa3a6.json
 *.sentinel
 *.info
+/packages/*/
