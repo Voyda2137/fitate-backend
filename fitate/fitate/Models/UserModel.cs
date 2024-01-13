@@ -44,6 +44,7 @@ public class UserModel
     public string Id { get; set; }
     
     public string UID { get; set; }
+    public string Name { get; set; }
     public List<Dish> Dishes { get; set; } = new List<Dish>();
     public List<Workout> Workouts { get; set; } = new List<Workout>();
     public Goal Goal { get; set; } = new Goal();

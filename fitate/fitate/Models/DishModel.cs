@@ -16,7 +16,6 @@ public class DishModel
         public float Fats { get; set; }
         public float Carbs { get; set; }
         public float? TotalCallories { get; set; }
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string AuthorId { get; set; }
+        public string Author { get; set; }
     }
 }

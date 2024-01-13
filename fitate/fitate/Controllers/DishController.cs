@@ -1,6 +1,8 @@
 ﻿using fitate.Models;
 using fitate.Utils;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
+using MongoDB.Driver;
 
 namespace fitate.Controllers;
 
@@ -16,7 +18,6 @@ public class DishController : ControllerBase
         _dishUtils = dishUtils;
         _databaseUtils = databaseUtils;
         _userUtils = userUtils;
-
     }
 
     [HttpPost("create")]
@@ -57,7 +58,7 @@ public class DishController : ControllerBase
                     Carbs = carbs,
                     TotalCallories = callories,
                     Name = dishModel.Name,
-                    AuthorId = user.Id
+                    Author = dishModel.Author
                 };
                 
                 collection.InsertOne(newDish);
@@ -71,6 +72,51 @@ public class DishController : ControllerBase
             {
                 StatusCode = 403
             };
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    [HttpGet("getDishes")]
+    public async Task<IActionResult> GetDishes()
+    {
+        var collection = _databaseUtils.GetDishCollection();
+        try
+        {
+            string token = Request.Headers.Authorization;
+            
+            if (string.IsNullOrEmpty(token) || !token.StartsWith("Bearer "))
+            {
+                return new ObjectResult("Unauthorized")
+                {
+                    StatusCode = 403
+                };
+            }
+            
+            token = token.Substring("Bearer ".Length).Trim();
+            
+            string uid = await _userUtils.VerifyUser(token);
+
+            if (!string.IsNullOrEmpty(uid))
+            {
+                var dishes = await collection.Find(_ => true).ToListAsync();
+                return new JsonResult(dishes)
+                {
+                    SerializerSettings = new JsonSerializerOptions
+                    {
+                        WriteIndented = true
+                    }
+                };
+                
+            }
+            return new ObjectResult("Unauthorized")
+            {
+                StatusCode = 403
+            };
+            
         }
         catch (Exception e)
         {

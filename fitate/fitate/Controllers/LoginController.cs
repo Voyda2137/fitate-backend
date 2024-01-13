@@ -39,7 +39,8 @@ public class LoginController: ControllerBase
 
             var newUser = new UserModel
             {
-                UID = uid
+                UID = uid,
+                Name = loginModel.Email
             };
             
             collection.InsertOne(newUser);
