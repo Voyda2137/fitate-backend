@@ -5,16 +5,16 @@ namespace fitate.Models;
 
 public enum MealTime
 {
-    Breakfast,
-    Dinner,
-    Supper
+    Breakfast = 1,
+    Dinner = 2,
+    Supper = 3
 }
 
-public class Dish
+public class UserDish
 {
     [BsonRepresentation(BsonType.ObjectId)]
     public string DishId { get; set; }
-    public int Portion { get; set; }
+    public float Portion { get; set; }
     public MealTime MealTime { get; set; }
     public long Day { get; set; }
 }
@@ -40,12 +40,12 @@ public class Goal
 public class UserModel
 {
     [BsonId]
-    [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
+    [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; }
     
     public string UID { get; set; }
     public string Name { get; set; }
-    public List<Dish> Dishes { get; set; } = new List<Dish>();
+    public List<UserDish> Dishes { get; set; } = new List<UserDish>();
     public List<Workout> Workouts { get; set; } = new List<Workout>();
     public Goal Goal { get; set; } = new Goal();
 }
