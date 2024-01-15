@@ -184,4 +184,201 @@ public class UserController : ControllerBase
             throw;
         }
     }
+    [HttpPost("workout")]
+    public async Task<IActionResult> CreateWorkout([FromBody] UserWorkout userWorkout)
+    {
+        try
+        {
+            string token = Request.Headers.Authorization;
+            var collection = _databaseUtils.GetUserCollection();
+
+            if (string.IsNullOrEmpty(token) || !token.StartsWith("Bearer "))
+            {
+                return new ObjectResult("Unauthorized")
+                {
+                    StatusCode = 403
+                };
+            }
+            
+            token = token.Substring("Bearer ".Length).Trim();
+
+            string uid = await _userUtils.VerifyUser(token);
+
+            if (!string.IsNullOrEmpty(uid))
+            {
+                var getUserFilter = Builders<UserModel>.Filter.Eq(u => u.UID, uid);
+                UserModel user = await collection.Find(getUserFilter).FirstOrDefaultAsync();
+                var newWorkout = new UserWorkout
+                {
+                    WorkoutID = userWorkout.WorkoutID,
+                    Day = userWorkout.Day,
+                    Distance = userWorkout.Distance != null ? userWorkout.Distance : 0,
+                    Reps = userWorkout.Reps != null ? userWorkout.Reps : 0,
+                    Weight = userWorkout.Weight != null ? userWorkout.Weight : 0
+                };
+                
+                user.Workouts.Add(newWorkout);
+
+                var addWorkout = Builders<UserModel>.Update.Set(u => u.Workouts, user.Workouts);
+                var addWorkoutQuery = await collection.UpdateOneAsync(getUserFilter, addWorkout);
+                if (addWorkoutQuery.ModifiedCount == 1)
+                {
+                    return new ObjectResult("Successfully added the workout")
+                    {
+                        StatusCode = 200
+                    };
+                }
+                return new ObjectResult("Could not add the workout")
+                {
+                    StatusCode = 500
+                };
+            }
+            return new ObjectResult("Unauthorized")
+            {
+                StatusCode = 403
+            };
+            
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Verification failed: {e.Message}");
+            throw;
+        }
+    }
+    [HttpGet("workouts")]
+    public async Task<IActionResult> GetWorkouts()
+    {
+        var collection = _databaseUtils.GetWorkoutCollection();
+        try
+        {
+            string token = Request.Headers.Authorization;
+            
+            if (string.IsNullOrEmpty(token) || !token.StartsWith("Bearer "))
+            {
+                return new ObjectResult("Unauthorized")
+                {
+                    StatusCode = 403
+                };
+            }
+            
+            token = token.Substring("Bearer ".Length).Trim();
+
+            string uid = await _userUtils.VerifyUser(token);
+
+            if (!string.IsNullOrEmpty(uid))
+            {
+                List<UserWorkoutModel.UserWorkout> workouts = new List<UserWorkoutModel.UserWorkout>();
+                var user = await _userUtils.GetUserByUID(uid);
+                foreach (var userWorkout in user.Workouts)
+                {
+                    var workout = await collection.Find(Builders<WorkoutModel.Workout>.Filter.Eq(w => w.WorkoutID, userWorkout.WorkoutID)).FirstOrDefaultAsync();
+
+                    if (workout != null)
+                    {
+                        if (!workout.CaloriesBurnedPerKm.HasValue && workout.CaloriesBurnedPerRep.HasValue)
+                        {
+                            float? totalCalories = (workout.CaloriesBurnedPerRep ?? 0) * userWorkout.Reps;
+                            UserWorkoutModel.UserWorkout formattedWorkout = new UserWorkoutModel.UserWorkout
+                            {
+                                Name = workout.Name,
+                                CaloriesBurned = totalCalories,
+                                Reps = userWorkout.Reps,
+                                Day = userWorkout.Day
+                            };
+                            workouts.Add(formattedWorkout);
+                        }
+                        else
+                        {
+                            float? totalCalories = (workout.CaloriesBurnedPerKm ?? 0) * userWorkout.Distance;
+                            UserWorkoutModel.UserWorkout formattedWorkout = new UserWorkoutModel.UserWorkout
+                            {
+                                Name = workout.Name,
+                                CaloriesBurned = totalCalories,
+                                Distance = userWorkout.Distance,
+                                Day = userWorkout.Day
+                            };
+                            workouts.Add(formattedWorkout);
+                        }
+                    }
+                }
+                return new JsonResult(workouts)
+                {
+                    SerializerSettings = new JsonSerializerOptions
+                    {
+                        WriteIndented = true
+                    }
+                };
+                
+            }
+            return new ObjectResult("Unauthorized")
+            {
+                StatusCode = 403
+            };
+            
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Verification failed: {e.Message}");
+            throw;
+        }
+    }
+
+    [HttpPost("goal")]
+    public async Task<IActionResult> SetGoal([FromBody] Goal goal)
+    {
+        try
+        {
+            string token = Request.Headers.Authorization;
+            var collection = _databaseUtils.GetUserCollection();
+
+            if (string.IsNullOrEmpty(token) || !token.StartsWith("Bearer "))
+            {
+                return new ObjectResult("Unauthorized")
+                {
+                    StatusCode = 403
+                };
+            }
+            
+            token = token.Substring("Bearer ".Length).Trim();
+
+            string uid = await _userUtils.VerifyUser(token);
+
+            if (!string.IsNullOrEmpty(uid))
+            {
+                var getUserFilter = Builders<UserModel>.Filter.Eq(u => u.UID, uid);
+                UserModel user = await collection.Find(getUserFilter).FirstOrDefaultAsync();
+                var newGoal = new Goal
+                {
+                    StartingWeight = goal.StartingWeight,
+                    StartingWeek = goal.StartingWeek,
+                    DesiredWeight = goal.DesiredWeight,
+                    DesiredWeek = goal.DesiredWeek
+                };
+                
+                var setGoal = Builders<UserModel>.Update.Set(u => u.Goal, newGoal);
+                var setGoalQuery = await collection.UpdateOneAsync(getUserFilter, setGoal);
+                if (setGoalQuery.ModifiedCount == 1)
+                {
+                    return new ObjectResult("Successfully set the goal")
+                    {
+                        StatusCode = 200
+                    };
+                }
+                return new ObjectResult("Could not set the goal")
+                {
+                    StatusCode = 500
+                };
+            }
+            return new ObjectResult("Unauthorized")
+            {
+                StatusCode = 403
+            };
+            
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Verification failed: {e.Message}");
+            throw;
+        }
+    }
 }

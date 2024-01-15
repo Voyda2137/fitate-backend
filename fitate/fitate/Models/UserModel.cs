@@ -19,13 +19,13 @@ public class UserDish
     public long Day { get; set; }
 }
 
-public class Workout
+public class UserWorkout
 {
     [BsonRepresentation(BsonType.ObjectId)]
-    public string WorkoutId { get; set; }
+    public string WorkoutID { get; set; }
     public int? Reps { get; set; }
-    public double? Weight { get; set; }
-    public double? Distance { get; set; }
+    public int? Weight { get; set; }
+    public float? Distance { get; set; }
     public long Day { get; set; }
 }
 
@@ -46,6 +46,6 @@ public class UserModel
     public string UID { get; set; }
     public string Name { get; set; }
     public List<UserDish> Dishes { get; set; } = new List<UserDish>();
-    public List<Workout> Workouts { get; set; } = new List<Workout>();
+    public List<UserWorkout> Workouts { get; set; } = new List<UserWorkout>();
     public Goal Goal { get; set; } = new Goal();
 }

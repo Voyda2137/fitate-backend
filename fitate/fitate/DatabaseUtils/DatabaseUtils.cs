@@ -23,4 +23,8 @@ public class DatabaseUtils
     {
         return _mongoDatabase.GetCollection<DishModel.Dish>("dishes");
     }
+    public IMongoCollection<WorkoutModel.Workout> GetWorkoutCollection()
+    {
+        return _mongoDatabase.GetCollection<WorkoutModel.Workout>("workouts");
+    }
 }

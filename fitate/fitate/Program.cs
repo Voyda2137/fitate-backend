@@ -35,6 +35,7 @@ builder.Services.AddScoped<DatabaseUtils>(sp =>
 
 builder.Services.AddScoped<UserUtils>();
 builder.Services.AddScoped<DishUtils>();
+builder.Services.AddScoped<WorkoutUtils>();
 
 var app = builder.Build();
 
