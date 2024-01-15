@@ -10,6 +10,6 @@ public class UserDishModel
         public float Carbs { get; set; }
         public float TotalCallories { get; set; }
         public MealTime MealTime { get; set; }
-        public long Day { get; set; }
+        public long Date { get; set; }
     }
 }

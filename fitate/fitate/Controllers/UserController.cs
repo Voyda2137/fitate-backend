@@ -88,7 +88,7 @@ public class UserController : ControllerBase
                     DishId = dish.DishId,
                     Portion = float.Parse(dish.Portion.ToString($"F{1}")),
                     MealTime = dish.MealTime,
-                    Day = dish.Day
+                    Date = dish.Date
                 };
                 
                 user.Dishes.Add(newDish);
@@ -157,7 +157,7 @@ public class UserController : ControllerBase
                             Carbs = dish.Carbs * userDish.Portion,
                             Fats = dish.Fats * userDish.Portion,
                             TotalCallories = totalCalories,
-                            Day = userDish.Day,
+                            Date = userDish.Date,
                             MealTime = userDish.MealTime
                         };
                         dishes.Add(formattedDish);
@@ -211,7 +211,7 @@ public class UserController : ControllerBase
                 var newWorkout = new UserWorkout
                 {
                     WorkoutID = userWorkout.WorkoutID,
-                    Day = userWorkout.Day,
+                    Date = userWorkout.Date,
                     Distance = userWorkout.Distance != null ? userWorkout.Distance : 0,
                     Reps = userWorkout.Reps != null ? userWorkout.Reps : 0,
                     Weight = userWorkout.Weight != null ? userWorkout.Weight : 0
@@ -283,7 +283,7 @@ public class UserController : ControllerBase
                                 Name = workout.Name,
                                 CaloriesBurned = totalCalories,
                                 Reps = userWorkout.Reps,
-                                Day = userWorkout.Day
+                                Date = userWorkout.Date
                             };
                             workouts.Add(formattedWorkout);
                         }
@@ -295,7 +295,7 @@ public class UserController : ControllerBase
                                 Name = workout.Name,
                                 CaloriesBurned = totalCalories,
                                 Distance = userWorkout.Distance,
-                                Day = userWorkout.Day
+                                Date = userWorkout.Date
                             };
                             workouts.Add(formattedWorkout);
                         }

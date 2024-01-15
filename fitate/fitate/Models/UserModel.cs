@@ -5,9 +5,9 @@ namespace fitate.Models;
 
 public enum MealTime
 {
-    Breakfast = 1,
-    Dinner = 2,
-    Supper = 3
+    Breakfast = 0,
+    Dinner = 1,
+    Supper = 2
 }
 
 public class UserDish
@@ -16,7 +16,7 @@ public class UserDish
     public string DishId { get; set; }
     public float Portion { get; set; }
     public MealTime MealTime { get; set; }
-    public long Day { get; set; }
+    public long Date { get; set; }
 }
 
 public class UserWorkout
@@ -26,7 +26,7 @@ public class UserWorkout
     public int? Reps { get; set; }
     public int? Weight { get; set; }
     public float? Distance { get; set; }
-    public long Day { get; set; }
+    public long Date { get; set; }
 }
 
 public class Goal

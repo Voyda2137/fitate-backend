@@ -9,6 +9,6 @@ public class UserWorkoutModel
         public float? Distance { get; set; }
         public int? Reps { get; set; }
         public float? CaloriesBurned { get; set; }
-        public long Day { get; set; }
+        public long Date { get; set; }
     }
 }
