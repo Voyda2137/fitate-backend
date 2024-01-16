@@ -464,6 +464,7 @@ public class UserController : ControllerBase
                     Height = info.Height,
                     Age = info.Age,
                     Gender = info.Gender,
+                    Weight = info.Weight,
                     ActivityLevel = info.ActivityLevel
                 };
 
