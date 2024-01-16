@@ -4,6 +4,7 @@ public class UserDishModel
 {
     public class UserDish
     {
+        public string UserDishId { get; set; }
         public string Name { get; set; }
         public float Proteins { get; set; }
         public float Fats { get; set; }

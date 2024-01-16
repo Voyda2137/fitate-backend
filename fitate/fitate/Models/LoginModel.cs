@@ -9,4 +9,7 @@ public class LoginModel
     public string Email { get; set; }
     [Required]
     public string Password { get; set; }
+    public int Height { get; set; }
+    public bool Gender { get; set; }
+    public int Age { get; set; }
 }

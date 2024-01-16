@@ -86,6 +86,7 @@ public class UserController : ControllerBase
                 var newDish = new UserDish
                 {
                     DishId = dish.DishId,
+                    UserDishId = DatabaseUtils.DatabaseUtils.RandomString(16),
                     Portion = float.Parse(dish.Portion.ToString($"F{1}")),
                     MealTime = dish.MealTime,
                     Date = dish.Date
@@ -152,6 +153,7 @@ public class UserController : ControllerBase
                         float totalCalories = (dish.TotalCallories ?? 0) * userDish.Portion; // actually never is equal to 0
                         UserDishModel.UserDish formattedDish = new UserDishModel.UserDish
                         {
+                            UserDishId = userDish.UserDishId,
                             Name = dish.Name,
                             Proteins = dish.Proteins * userDish.Portion,
                             Carbs = dish.Carbs * userDish.Portion,
@@ -184,6 +186,59 @@ public class UserController : ControllerBase
             throw;
         }
     }
+    [HttpDelete("dish/{userDishId}")]
+    public async Task<IActionResult> DeleteDish(string userDishId)
+    {
+        try
+        {
+            string token = Request.Headers.Authorization;
+            var collection = _databaseUtils.GetUserCollection();
+
+            if (string.IsNullOrEmpty(token) || !token.StartsWith("Bearer "))
+            {
+                return new ObjectResult("Unauthorized")
+                {
+                    StatusCode = 403
+                };
+            }
+
+            token = token.Substring("Bearer ".Length).Trim();
+
+            string uid = await _userUtils.VerifyUser(token);
+
+            if (!string.IsNullOrEmpty(uid))
+            {
+                var getUserFilter = Builders<UserModel>.Filter.Eq(u => u.UID, uid);
+                var update = Builders<UserModel>.Update.PullFilter(u => u.Dishes, Builders<UserDish>.Filter.Eq(d => d.UserDishId, userDishId));
+            
+                var updateResult = await collection.UpdateOneAsync(getUserFilter, update);
+
+                if (updateResult.ModifiedCount > 0)
+                {
+                    return new ObjectResult("Successfully deleted the dish")
+                    {
+                        StatusCode = 200
+                    };
+                }
+
+                return new ObjectResult("Dish not found or could not be deleted")
+                {
+                    StatusCode = 404
+                };
+            }
+
+            return new ObjectResult("Unauthorized")
+            {
+                StatusCode = 403
+            };
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Verification failed: {e.Message}");
+            throw;
+        }
+    }
+
     [HttpPost("workout")]
     public async Task<IActionResult> CreateWorkout([FromBody] UserWorkout userWorkout)
     {
@@ -211,6 +266,7 @@ public class UserController : ControllerBase
                 var newWorkout = new UserWorkout
                 {
                     WorkoutID = userWorkout.WorkoutID,
+                    UserWorkoutID = DatabaseUtils.DatabaseUtils.RandomString(16),
                     Date = userWorkout.Date,
                     Distance = userWorkout.Distance != null ? userWorkout.Distance : 0,
                     Reps = userWorkout.Reps != null ? userWorkout.Reps : 0,
@@ -292,6 +348,7 @@ public class UserController : ControllerBase
                             float? totalCalories = (workout.CaloriesBurnedPerKm ?? 0) * userWorkout.Distance;
                             UserWorkoutModel.UserWorkout formattedWorkout = new UserWorkoutModel.UserWorkout
                             {
+                                UserWorkoutID = userWorkout.UserWorkoutID,
                                 Name = workout.Name,
                                 CaloriesBurned = totalCalories,
                                 Distance = userWorkout.Distance,
@@ -315,6 +372,58 @@ public class UserController : ControllerBase
                 StatusCode = 403
             };
             
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Verification failed: {e.Message}");
+            throw;
+        }
+    }
+    [HttpDelete("workout/{userWorkoutId}")]
+    public async Task<IActionResult> DeleteWorkout(string userWorkoutId)
+    {
+        try
+        {
+            string token = Request.Headers.Authorization;
+            var collection = _databaseUtils.GetUserCollection();
+
+            if (string.IsNullOrEmpty(token) || !token.StartsWith("Bearer "))
+            {
+                return new ObjectResult("Unauthorized")
+                {
+                    StatusCode = 403
+                };
+            }
+
+            token = token.Substring("Bearer ".Length).Trim();
+
+            string uid = await _userUtils.VerifyUser(token);
+
+            if (!string.IsNullOrEmpty(uid))
+            {
+                var getUserFilter = Builders<UserModel>.Filter.Eq(u => u.UID, uid);
+                var update = Builders<UserModel>.Update.PullFilter(u => u.Workouts, Builders<UserWorkout>.Filter.Eq(w => w.UserWorkoutID, userWorkoutId));
+
+                var updateResult = await collection.UpdateOneAsync(getUserFilter, update);
+
+                if (updateResult.ModifiedCount > 0)
+                {
+                    return new ObjectResult("Successfully deleted the workout")
+                    {
+                        StatusCode = 200
+                    };
+                }
+
+                return new ObjectResult("Workout not found or could not be deleted")
+                {
+                    StatusCode = 404
+                };
+            }
+
+            return new ObjectResult("Unauthorized")
+            {
+                StatusCode = 403
+            };
         }
         catch (Exception e)
         {
