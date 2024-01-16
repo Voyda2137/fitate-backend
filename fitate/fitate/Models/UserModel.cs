@@ -10,6 +10,13 @@ public enum MealTime
     Supper = 2
 }
 
+public enum ActivityLevelTypes {
+    Sedentary = 0,
+    LightActivity = 1,
+    ModerateActivity = 2,
+    VeryActive = 3
+}
+
 public class UserDish
 {
     [BsonRepresentation(BsonType.ObjectId)]
@@ -32,12 +39,12 @@ public class UserWorkout
     public long Date { get; set; }
 }
 
-public class Goal
+public class Info
 {
-    public double StartingWeight { get; set; }
-    public double DesiredWeight { get; set; }
-    public long StartingWeek { get; set; }
-    public long DesiredWeek { get; set; }
+    public int Height { get; set; }
+    public bool Gender { get; set; }
+    public int Age { get; set; }
+    public ActivityLevelTypes ActivityLevel { get; set; }
 }
 
 public class UserModel
@@ -48,10 +55,8 @@ public class UserModel
     
     public string UID { get; set; }
     public string Name { get; set; }
-    public int Height { get; set; }
-    public bool Gender { get; set; }
-    public int Age { get; set; }
+    
     public List<UserDish> Dishes { get; set; } = new List<UserDish>();
     public List<UserWorkout> Workouts { get; set; } = new List<UserWorkout>();
-    public Goal Goal { get; set; } = new Goal();
+    public Info Info { get; set; } = new Info();
 }

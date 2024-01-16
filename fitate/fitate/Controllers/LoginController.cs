@@ -41,9 +41,6 @@ public class LoginController: ControllerBase
             {
                 UID = uid,
                 Name = loginModel.Email,
-                Gender = loginModel.Gender,
-                Age = loginModel.Age,
-                Height = loginModel.Height
             };
             
             collection.InsertOne(newUser);

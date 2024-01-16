@@ -186,8 +186,8 @@ public class UserController : ControllerBase
             throw;
         }
     }
-    [HttpDelete("dish/{userDishId}")]
-    public async Task<IActionResult> DeleteDish(string userDishId)
+    [HttpDelete("dish")]
+    public async Task<IActionResult> DeleteDish([FromBody] UserDishModel.UserDish request)
     {
         try
         {
@@ -209,7 +209,7 @@ public class UserController : ControllerBase
             if (!string.IsNullOrEmpty(uid))
             {
                 var getUserFilter = Builders<UserModel>.Filter.Eq(u => u.UID, uid);
-                var update = Builders<UserModel>.Update.PullFilter(u => u.Dishes, Builders<UserDish>.Filter.Eq(d => d.UserDishId, userDishId));
+                var update = Builders<UserModel>.Update.PullFilter(u => u.Dishes, Builders<UserDish>.Filter.Eq(d => d.UserDishId, request.UserDishId));
             
                 var updateResult = await collection.UpdateOneAsync(getUserFilter, update);
 
@@ -238,6 +238,7 @@ public class UserController : ControllerBase
             throw;
         }
     }
+
 
     [HttpPost("workout")]
     public async Task<IActionResult> CreateWorkout([FromBody] UserWorkout userWorkout)
@@ -379,8 +380,8 @@ public class UserController : ControllerBase
             throw;
         }
     }
-    [HttpDelete("workout/{userWorkoutId}")]
-    public async Task<IActionResult> DeleteWorkout(string userWorkoutId)
+    [HttpDelete("workout")]
+    public async Task<IActionResult> DeleteWorkout([FromBody] UserWorkoutModel.UserWorkout request)
     {
         try
         {
@@ -402,7 +403,7 @@ public class UserController : ControllerBase
             if (!string.IsNullOrEmpty(uid))
             {
                 var getUserFilter = Builders<UserModel>.Filter.Eq(u => u.UID, uid);
-                var update = Builders<UserModel>.Update.PullFilter(u => u.Workouts, Builders<UserWorkout>.Filter.Eq(w => w.UserWorkoutID, userWorkoutId));
+                var update = Builders<UserModel>.Update.PullFilter(u => u.Workouts, Builders<UserWorkout>.Filter.Eq(w => w.UserWorkoutID, request.UserWorkoutID));
 
                 var updateResult = await collection.UpdateOneAsync(getUserFilter, update);
 
@@ -432,8 +433,9 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpPost("goal")]
-    public async Task<IActionResult> SetGoal([FromBody] Goal goal)
+
+    [HttpPost("info")]
+    public async Task<IActionResult> SetInfo([FromBody] Info info)
     {
         try
         {
@@ -447,7 +449,7 @@ public class UserController : ControllerBase
                     StatusCode = 403
                 };
             }
-            
+
             token = token.Substring("Bearer ".Length).Trim();
 
             string uid = await _userUtils.VerifyUser(token);
@@ -456,33 +458,36 @@ public class UserController : ControllerBase
             {
                 var getUserFilter = Builders<UserModel>.Filter.Eq(u => u.UID, uid);
                 UserModel user = await collection.Find(getUserFilter).FirstOrDefaultAsync();
-                var newGoal = new Goal
+
+                var newInfo = new Info
                 {
-                    StartingWeight = goal.StartingWeight,
-                    StartingWeek = goal.StartingWeek,
-                    DesiredWeight = goal.DesiredWeight,
-                    DesiredWeek = goal.DesiredWeek
+                    Height = info.Height,
+                    Age = info.Age,
+                    Gender = info.Gender,
+                    ActivityLevel = info.ActivityLevel
                 };
-                
-                var setGoal = Builders<UserModel>.Update.Set(u => u.Goal, newGoal);
-                var setGoalQuery = await collection.UpdateOneAsync(getUserFilter, setGoal);
-                if (setGoalQuery.ModifiedCount == 1)
+
+                var setInfo = Builders<UserModel>.Update.Set(u => u.Info, newInfo);
+                var setInfoQuery = await collection.UpdateOneAsync(getUserFilter, setInfo);
+
+                if (setInfoQuery.ModifiedCount == 1)
                 {
-                    return new ObjectResult("Successfully set the goal")
+                    return new ObjectResult("Successfully set info")
                     {
                         StatusCode = 200
                     };
                 }
-                return new ObjectResult("Could not set the goal")
+
+                return new ObjectResult("Could not set info")
                 {
                     StatusCode = 500
                 };
             }
+
             return new ObjectResult("Unauthorized")
             {
                 StatusCode = 403
             };
-            
         }
         catch (Exception e)
         {
@@ -490,4 +495,5 @@ public class UserController : ControllerBase
             throw;
         }
     }
+
 }
