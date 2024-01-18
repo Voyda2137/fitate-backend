@@ -338,6 +338,7 @@ public class UserController : ControllerBase
                             UserWorkoutModel.UserWorkout formattedWorkout = new UserWorkoutModel.UserWorkout
                             {
                                 Name = workout.Name,
+                                UserWorkoutID = userWorkout.UserWorkoutID,
                                 CaloriesBurned = totalCalories,
                                 Reps = userWorkout.Reps,
                                 Date = userWorkout.Date
